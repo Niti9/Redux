@@ -10,8 +10,17 @@
 
 /** to increment amoumt */
 
+//Now create function for action called action creator
+
 import {createStore, applyMiddleware} from 'redux'  // import aplyMiddleware
 import logger from 'redux-logger' //import logger 
+
+// action name constants (used to resolve the conflict kyunki increment , decrement wagarh bhot baar repeat ho rha hai 
+// if condition  mein aur action creator aur dispatch mein bhi)
+const inc = 'increment'; // string(increment) convert into constant
+const dec = 'decrement';
+const incByAmo= 'incrementByAmount';
+
 
 //to make Store
 const store = createStore(reducer, applyMiddleware(logger.default)); // using logger because it is a middleware
@@ -22,15 +31,15 @@ const store = createStore(reducer, applyMiddleware(logger.default)); // using lo
 function reducer(state={amount: 1}, action){ // state means previous state and action means the action we doing like add, remove etc.
 
     //immutable (means the original state not change but copy of original create and change)
-    if(action.type ==='increment')
+    if(action.type === inc)
     {
         return {amount: state.amount+1} 
     }
-    if(action.type==='decrement')
+    if(action.type=== dec)
     {
         return {amount: state.amount -1}
     }
-    if(action.type==='incrementByAmount'){
+    if(action.type=== incByAmo ){
 
         return {amount: state.amount + action.payload}
     }
@@ -39,6 +48,17 @@ function reducer(state={amount: 1}, action){ // state means previous state and a
 }
 
 
+//Action Creator
+function increment(){
+    return{type: inc}
+}
+function decrement(){
+    return{type: dec}
+}
+function incrementByAmount(value){
+    return{type: incByAmo , payload:value}
+}
+
 
 
 
@@ -46,13 +66,13 @@ function reducer(state={amount: 1}, action){ // state means previous state and a
 //global state
 console.log(store.getState())
 
-//action with dispatch means like click function
-store.dispatch({type:'increment'}) // increment to increase value
-store.dispatch({type:'decrement'}) // decrement  to decrease the value
-store.dispatch({type:'incrementByAmount', payload:4}) // here payload must be given it will like a gap between the values
+//calling action creator
+store.dispatch(increment()) // increment to increase value
+store.dispatch(decrement()) // decrement  to decrease the value
+store.dispatch(incrementByAmount(4)) // here payload must be given it will like a gap between the values
 
 
-// new state(changes)
+// new state(c hanges)
 console.log(store.getState())
 
 
