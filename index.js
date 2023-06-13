@@ -26,15 +26,31 @@ function reducer(state={amount: 1}, action){ // state means previous state and a
     {
         return {amount: state.amount+1} 
     }
+    if(action.type==='decrement')
+    {
+        return {amount: state.amount -1}
+    }
+    if(action.type==='incrementByAmount'){
+
+        return {amount: state.amount + action.payload}
+    }
     
     return state 
 }
+
+
+
+
+
 
 //global state
 console.log(store.getState())
 
 //action with dispatch means like click function
-store.dispatch({type:'increment'}) // increment is predefined to increase value
+store.dispatch({type:'increment'}) // increment to increase value
+store.dispatch({type:'decrement'}) // decrement  to decrease the value
+store.dispatch({type:'incrementByAmount', payload:4}) // here payload must be given it will like a gap between the values
+
 
 // new state(changes)
 console.log(store.getState())
