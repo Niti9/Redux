@@ -13,11 +13,11 @@
 
 /** to increment amoumt */
 
-//create thug
+//create thunk middleware
 
 import { createStore, applyMiddleware } from 'redux'  // import aplyMiddleware
 import logger from 'redux-logger' //import logger 
-import axios from 'axios';
+
 
 // action name constants (used to resolve the conflict kyunki increment , decrement wagarh bhot baar repeat ho rha hai 
 // if condition  mein aur action creator aur dispatch mein bhi)
@@ -35,7 +35,7 @@ const store = createStore(reducer, applyMiddleware(logger.default)); // using lo
 //initialize state here
 function reducer(state = { amount: 1 }, action) { // state means previous state and action means the action we doing like add, remove etc.
 
-    //immutable (means the original state not change but copy of original create and change)
+    // here state of amount is immutable (means the original state not change but copy of original create and change)
     switch (action.type) {
         case init:
             return { amount: action.payload };
@@ -56,7 +56,7 @@ function reducer(state = { amount: 1 }, action) { // state means previous state 
 
 
 //Action Creator
-function initUser(value) {
+function initUser(value) { // new action for thunk 
     return { type: init, payload: value}
 }
 function increment() {
