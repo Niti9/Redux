@@ -23,7 +23,7 @@ import thunk from 'redux-thunk';
 // action name constants (used to resolve the conflict kyunki increment , decrement wagarh bhot baar repeat ho rha hai 
 // if condition  mein aur action creator aur dispatch mein bhi)
 // const init = 'account/init';
-const inc = 'account/increment'; 
+const inc = 'account/increment';
 const dec = 'account/decrement';
 const incByAmo = '/account/incrementByAmount';
 const incBonus = 'bonus/increment';
@@ -49,9 +49,9 @@ function accountReducer(state = { amount: 1 }, action) { // state means previous
         case getAccUserFulFilled:
             return { amount: action.payload };
         case getAccUserRejected:
-            return { ...state , error: action.error}; //spread operator for no change
+            return { ...state, error: action.error }; //spread operator for no change
         case getAccUserPending:
-            return { amount: action.payload };
+            return { ...state, pending: true };
 
         case inc:
             return { amount: state.amount + 1 };
@@ -88,29 +88,30 @@ function bonusReducer(state = { points: 0 }, action) {
 //also give dynamic id to the api
 
 function getUserAccount(id) { // new action for thunk (here dispatch, and getState(to get global state) used )
-    return async (dispatch, getState)=>{
-    try{
-           const { data } = await axios.get(`http://localhost:3000/account/${id}`) //ye db.json ka accounts ka data le rhe hai
-           dispatch(getAccountUserFulFilled(data.amount))
-        
+    return async (dispatch, getState) => {
+        try {
+            dispatch(getAccountUserPending());
+            const { data } = await axios.get(`http://localhost:3000/account/${id}`) //ye db.json ka accounts ka data le rhe hai
+            dispatch(getAccountUserFulFilled(data.amount))
+
+        }
+        catch (error) {
+            dispatch(getAccountUserRejected(error.message));
+        }
     }
-    catch(error){
-        dispatch(getAccountUserRejected(error.message));
-    }
-}
 }
 
 
-function getAccountUserFulFilled(value) { 
+function getAccountUserFulFilled(value) {
 
     return { type: getAccUserFulFilled, payload: value }
 }
-function getAccountUserRejected(error) { 
+function getAccountUserRejected(error) {
 
     return { type: getAccUserRejected, error: error }
 }
-function getAccountUserPending(value) { 
-    return { type: getAccUserPending, payload: value }
+function getAccountUserPending() {
+    return { type: getAccUserPending }
 }
 
 
@@ -147,18 +148,26 @@ setTimeout(() => {
 
 /*
 output:
-action undefined @ 16:38:50.548
+action undefined @ 16:44:48.284
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
    action     [AsyncFunction (anonymous)]
    next state { account: { amount: 1 }, bonus: { points: 0 } }
- action account/getUser/rejected @ 16:38:50.639
+ action account/getUser/Pending @ 16:44:48.284
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
+   action     { type: 'account/getUser/Pending' }
+   next state { account: { amount: 1, pending: true }, bonus: { points: 0 } }
+ action account/getUser/rejected @ 16:44:48.369
+   prev state { account: { amount: 1, pending: true }, bonus: { points: 0 } }
    action     {
     type: 'account/getUser/rejected',
     error: 'Request failed with status code 404'
   }
    next state {
-    account: { amount: 1, error: 'Request failed with status code 404' },   
+    account: {
+      amount: 1,
+      pending: true,
+      error: 'Request failed with status code 404'
+    },
     bonus: { points: 0 }
   }
   */
