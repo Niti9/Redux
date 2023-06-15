@@ -57,19 +57,37 @@ function reducer(state = { amount: 1 }, action) { // state means previous state 
 
 
 //Async API call
-async function getUser() {
-    const { data } = await axios.get('http://localhost:3000/accounts/1') //ye db.json ka accounts ka data le rhe hai
-    console.log(data)
+// async function getUser() {
+//     const { data } = await axios.get('http://localhost:3000/accounts/1') //ye db.json ka accounts ka data le rhe hai
+//     console.log(data)
+// }
+
+// getUser();
+
+
+
+
+
+//Action Creator it should be synchronous
+// now make this initUser change into getUser
+//also give dynamic id to the api
+
+function getUser(id) { // new action for thunk (here dispatch, and getState(to get global state) used )
+
+    return async (dispatch, getState) => {
+        const { data } = await axios.get(`http://localhost:3000/accounts/${id}`) //ye db.json ka accounts ka data le rhe hai
+        dispatch(initUser(data.amount))
+        // dispatch({type: init, payload: data.amount})
+    }
 }
 
-getUser();
 
 
-//Action Creator
-async function initUser(dispatch,getState) { // new action for thunk (here dispatch, and getState(to get global state) used )
-    const { data } = await axios.get('http://localhost:3000/accounts/1') //ye db.json ka accounts ka data le rhe hai
-    dispatch({ type: init, payload: data.amount })
+function initUser(value) {
+    
+    return { type: init, payload: value }
 }
+
 function increment() {
     return { type: inc }
 }
@@ -77,38 +95,63 @@ function decrement() {
     return { type: dec }
 }
 function incrementByAmount(value) {
-    return { type: incByAmo, payload: value }
+    return { type: incByAmo, payload: value } //it is like plain object
 }
 
 
+// //history of commands
+// const history= []
+// store.subscribe(()=>{
+//     history.push(store.getState())
+//     console.log(history)
+// })
 
 
 
-//global state
-console.log(store.getState())
-
-//calling action creator
-// store.dispatch(increment()) // increment to increase value
-// store.dispatch(decrement()) // decrement  to decrease the value
-// store.dispatch(incrementByAmount(4)) // here payload must be given it will like a gap between the values
-store.dispatch(initUser) // here payload must be given it will make gap b/w values
+setTimeout(()=>{
+    // store.dispatch(increment())
+    // store.dispatch(incrementByAmount(300))
+    // store.dispatch(getUser(1))// db.json ke acccounts ki id=1
+    store.dispatch(getUser(2))// db.json ke acccounts ki id=2
+},100)
 
 
-// new state(c hanges)
-console.log(store.getState())
+//sabka ek saath output:
 
-/**
- * output:
- * 
-{ amount: 1 }
- action undefined @ 07:50:54.898
-   prev state { amount: 1 }
-   action     [AsyncFunction: initUser]
-   next state { amount: 1 }
-{ amount: 1 }
-{ id: 1, amount: 200 }
- action init @ 07:50:54.962
-   prev state { amount: 1 }
-   action     { type: 'init', payload: 200 }
-   next state { amount: 200 }
- */
+// action increment @ 08:51:07.815
+// prev state { amount: 1 }
+// action     { type: 'increment' }
+// next state { amount: 2 }
+// action incrementByAmount @ 08:51:07.825
+// prev state { amount: 2 }
+// action     { type: 'incrementByAmount', payload: 300 }
+// next state { amount: 302 }
+// action undefined @ 08:51:07.827
+// prev state { amount: 302 }
+// action     [AsyncFunction (anonymous)]
+// next state { amount: 302 }
+// action undefined @ 08:51:07.872
+// prev state { amount: 302 }
+// action     [AsyncFunction (anonymous)]
+// next state { amount: 302 }
+// action init @ 08:51:07.917
+// prev state { amount: 302 }
+// action     { type: 'init', payload: 200 }
+// next state { amount: 200 }
+// action init @ 08:51:07.925
+// prev state { amount: 200 }
+// action     { type: 'init', payload: 100 }
+// next state { amount: 100 }
+
+
+
+// sirf getUser ka output:
+
+// action undefined @ 08:52:13.668
+//    prev state { amount: 1 }
+//    action     [AsyncFunction (anonymous)]
+//    next state { amount: 1 }
+//  action init @ 08:52:13.739
+//    prev state { amount: 1 }
+//    action     { type: 'init', payload: 100 }
+//    next state { amount: 100 }
