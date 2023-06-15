@@ -13,28 +13,34 @@
 
 /** to increment amoumt */
 
-//create thunk middleware
+//Using  multi reducer type concept 
 
-import { createStore, applyMiddleware } from 'redux'  // import aplyMiddleware
+import { createStore, applyMiddleware, combineReducers } from 'redux'  // import aplyMiddleware
 import logger from 'redux-logger' //import logger 
 import axios from 'axios';
 import thunk from 'redux-thunk';
 
 // action name constants (used to resolve the conflict kyunki increment , decrement wagarh bhot baar repeat ho rha hai 
 // if condition  mein aur action creator aur dispatch mein bhi)
-const inc = 'increment'; // string(increment) convert into constant
-const dec = 'decrement';
-const incByAmo = 'incrementByAmount';
-const init = 'init';
+const inc = 'account/increment'; // schema/then reducer
+const dec = 'account/decrement';
+const incByAmo = '/account/incrementByAmount';
+const incBonus = 'bonus/increment';
+const init = 'account/init';
 
 
 //to make Store
-const store = createStore(reducer, applyMiddleware(logger.default, thunk.default)); // using logger because it is a middleware
+const store = createStore(
+    combineReducers({ //it is like we made reducer in test.js file
+        account: accountReducer,
+        bonus: bonusReducer
+    }),
+    applyMiddleware(logger.default, thunk.default)); // using logger because it is a middleware
 
 
 
 //initialize state here
-function reducer(state = { amount: 1 }, action) { // state means previous state and action means the action we doing like add, remove etc.
+function accountReducer(state = { amount: 1 }, action) { // state means previous state and action means the action we doing like add, remove etc.
 
     // here state of amount is immutable (means the original state not change but copy of original create and change)
     switch (action.type) {
@@ -55,14 +61,17 @@ function reducer(state = { amount: 1 }, action) { // state means previous state 
     }
 }
 
-
-//Async API call
-// async function getUser() {
-//     const { data } = await axios.get('http://localhost:3000/accounts/1') //ye db.json ka accounts ka data le rhe hai
-//     console.log(data)
-// }
-
-// getUser();
+function bonusReducer(state = { points: 0 }, action) {
+    switch (action.type) {
+        case incBonus:
+            return { points: state.points + 1 };
+        case incByAmo:
+            if (action.payload >= 100)
+                return { points: state.points + 1 };
+        default:
+            return state;
+    }
+}
 
 
 
@@ -84,7 +93,7 @@ function getUser(id) { // new action for thunk (here dispatch, and getState(to g
 
 
 function initUser(value) {
-    
+
     return { type: init, payload: value }
 }
 
@@ -97,61 +106,28 @@ function decrement() {
 function incrementByAmount(value) {
     return { type: incByAmo, payload: value } //it is like plain object
 }
+function incrementBonus(value) {
+    return { type: incBonus } //it is like plain object
+}
 
 
-// //history of commands
-// const history= []
-// store.subscribe(()=>{
-//     history.push(store.getState())
-//     console.log(history)
-// })
+setTimeout(() => {
+   
+    // store.dispatch(getUser(2))// db.json ke acccounts ki id=2
+    // store.dispatch(incrementByAmount(200)) 
+    store.dispatch(incrementBonus()) 
+}, 100)
 
+/*
+output:
 
-
-setTimeout(()=>{
-    // store.dispatch(increment())
-    // store.dispatch(incrementByAmount(300))
-    // store.dispatch(getUser(1))// db.json ke acccounts ki id=1
-    store.dispatch(getUser(2))// db.json ke acccounts ki id=2
-},100)
-
-
-//sabka ek saath output:
-
-// action increment @ 08:51:07.815
-// prev state { amount: 1 }
-// action     { type: 'increment' }
-// next state { amount: 2 }
-// action incrementByAmount @ 08:51:07.825
-// prev state { amount: 2 }
-// action     { type: 'incrementByAmount', payload: 300 }
-// next state { amount: 302 }
-// action undefined @ 08:51:07.827
-// prev state { amount: 302 }
-// action     [AsyncFunction (anonymous)]
-// next state { amount: 302 }
-// action undefined @ 08:51:07.872
-// prev state { amount: 302 }
-// action     [AsyncFunction (anonymous)]
-// next state { amount: 302 }
-// action init @ 08:51:07.917
-// prev state { amount: 302 }
-// action     { type: 'init', payload: 200 }
-// next state { amount: 200 }
-// action init @ 08:51:07.925
-// prev state { amount: 200 }
-// action     { type: 'init', payload: 100 }
-// next state { amount: 100 }
-
-
-
-// sirf getUser ka output:
-
-// action undefined @ 08:52:13.668
-//    prev state { amount: 1 }
-//    action     [AsyncFunction (anonymous)]
-//    next state { amount: 1 }
-//  action init @ 08:52:13.739
-//    prev state { amount: 1 }
-//    action     { type: 'init', payload: 100 }
-//    next state { amount: 100 }
+ action undefined @ 11:55:15.844
+   prev state { account: { amount: 1 }, bonus: { points: 0 } }
+   action     [AsyncFunction (anonymous)]
+   next state { account: { amount: 1 }, bonus: { points: 0 } }
+ action init @ 11:55:15.961
+   prev state { account: { amount: 1 }, bonus: { points: 0 } }
+   action     { type: 'init', payload: 100 }
+   next state { account: { amount: 100 }, bonus: { points: 0 } }
+  
+   */
