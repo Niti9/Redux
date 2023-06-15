@@ -49,9 +49,9 @@ function accountReducer(state = { amount: 1 }, action) { // state means previous
         case getAccUserFulFilled:
             return { amount: action.payload };
         case getAccUserRejected:
-            return { ...state, error: action.error }; //spread operator for no change
+            return { ...state, error: action.error, pending:false }; //spread operator for no change
         case getAccUserPending:
-            return { ...state, pending: true };
+            return { ...state, pending: true};
 
         case inc:
             return { amount: state.amount + 1 };
@@ -148,15 +148,15 @@ setTimeout(() => {
 
 /*
 output:
-action undefined @ 16:44:48.284
+ action undefined @ 16:48:58.947
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
    action     [AsyncFunction (anonymous)]
    next state { account: { amount: 1 }, bonus: { points: 0 } }
- action account/getUser/Pending @ 16:44:48.284
+ action account/getUser/Pending @ 16:48:58.947
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
    action     { type: 'account/getUser/Pending' }
    next state { account: { amount: 1, pending: true }, bonus: { points: 0 } }
- action account/getUser/rejected @ 16:44:48.369
+ action account/getUser/rejected @ 16:48:59.034
    prev state { account: { amount: 1, pending: true }, bonus: { points: 0 } }
    action     {
     type: 'account/getUser/rejected',
@@ -165,7 +165,7 @@ action undefined @ 16:44:48.284
    next state {
     account: {
       amount: 1,
-      pending: true,
+      pending: false,
       error: 'Request failed with status code 404'
     },
     bonus: { points: 0 }
