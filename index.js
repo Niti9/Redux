@@ -22,12 +22,14 @@ import thunk from 'redux-thunk';
 
 // action name constants (used to resolve the conflict kyunki increment , decrement wagarh bhot baar repeat ho rha hai 
 // if condition  mein aur action creator aur dispatch mein bhi)
-const inc = 'account/increment'; // schema/then reducer
+// const init = 'account/init';
+const inc = 'account/increment'; 
 const dec = 'account/decrement';
 const incByAmo = '/account/incrementByAmount';
 const incBonus = 'bonus/increment';
-const init = 'account/init';
-
+const getAccUserPending = 'account/getUser/Pending'
+const getAccUserFulFilled = 'account/getUser/fulfilled'
+const getAccUserRejected = 'account/getUser/rejected'
 
 //to make Store
 const store = createStore(
@@ -44,7 +46,11 @@ function accountReducer(state = { amount: 1 }, action) { // state means previous
 
     // here state of amount is immutable (means the original state not change but copy of original create and change)
     switch (action.type) {
-        case init:
+        case getAccUserFulFilled:
+            return { amount: action.payload };
+        case getAccUserRejected:
+            return { ...state , error: action.error}; //spread operator for no change
+        case getAccUserPending:
             return { amount: action.payload };
 
         case inc:
@@ -81,14 +87,32 @@ function bonusReducer(state = { points: 0 }, action) {
 // now make this initUser change into getUser
 //also give dynamic id to the api
 
-function getUser(id) { // new action for thunk (here dispatch, and getState(to get global state) used )
-
-    return async (dispatch, getState) => {
-        const { data } = await axios.get(`http://localhost:3000/accounts/${id}`) //ye db.json ka accounts ka data le rhe hai
-        dispatch(initUser(data.amount))
-        // dispatch({type: init, payload: data.amount})
+function getUserAccount(id) { // new action for thunk (here dispatch, and getState(to get global state) used )
+    return async (dispatch, getState)=>{
+    try{
+           const { data } = await axios.get(`http://localhost:3000/account/${id}`) //ye db.json ka accounts ka data le rhe hai
+           dispatch(getAccountUserFulFilled(data.amount))
+        
+    }
+    catch(error){
+        dispatch(getAccountUserRejected(error.message));
     }
 }
+}
+
+
+function getAccountUserFulFilled(value) { 
+
+    return { type: getAccUserFulFilled, payload: value }
+}
+function getAccountUserRejected(error) { 
+
+    return { type: getAccUserRejected, error: error }
+}
+function getAccountUserPending(value) { 
+    return { type: getAccUserPending, payload: value }
+}
+
 
 
 
@@ -112,22 +136,29 @@ function incrementBonus(value) {
 
 
 setTimeout(() => {
-   
+
     // store.dispatch(getUser(2))// db.json ke acccounts ki id=2
     // store.dispatch(incrementByAmount(200)) 
-    store.dispatch(incrementBonus()) 
+    // store.dispatch(incrementBonus())
+    store.dispatch(getUserAccount(3))
+
 }, 100)
+
 
 /*
 output:
-
- action undefined @ 11:55:15.844
+action undefined @ 16:38:50.548
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
    action     [AsyncFunction (anonymous)]
    next state { account: { amount: 1 }, bonus: { points: 0 } }
- action init @ 11:55:15.961
+ action account/getUser/rejected @ 16:38:50.639
    prev state { account: { amount: 1 }, bonus: { points: 0 } }
-   action     { type: 'init', payload: 100 }
-   next state { account: { amount: 100 }, bonus: { points: 0 } }
-  
-   */
+   action     {
+    type: 'account/getUser/rejected',
+    error: 'Request failed with status code 404'
+  }
+   next state {
+    account: { amount: 1, error: 'Request failed with status code 404' },   
+    bonus: { points: 0 }
+  }
+  */
