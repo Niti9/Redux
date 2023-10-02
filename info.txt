@@ -1,0 +1,126 @@
+/** create index.js file
+ * then create package.json through type command in
+ * terminal = npm init -y
+ * then install redux = npm install Redux
+ * Now we install a middleware = npm install redux-logger 
+ * to use applyMiddleware in Redux
+ * then install = npm i -g json-server
+ * to run json server
+ * then run this command in cmd because terminal will not run this = json-server db.json
+*/
+
+
+// we have to change type as "module" in package.json
+to run "store" in index.js
+ 
+
+
+
+Reducer helps to change previousState + new action
+means by combination of state and action we create new state or key
+Reducer are some function return always state  
+it has two parameter(previousState, action)
+like in prevState ==200 and new action is deposit 100 rupee
+then return new state that is 300 
+
+
+
+Middlewares 
+it can be depositAsync like bank take some process from another place
+middleware can also perform two action after first action
+as success or failure
+
+
+
+
+
+
+
+
+what is action
+action never write but perform it is like this
+{type: 'increment'}
+
+
+
+//global state access as
+store.getState()
+
+
+//dispatch used to send event or action 
+store.dispatch({type:'increment'})
+
+
+
+// we can check data by 
+console.log(store.getState());
+
+
+//subscribe is a function used to update the new state 
+//every time it will automatically update or call
+//in react it is already used 
+store.subscribe(()=>{
+    console.log(store.getState())
+})
+
+
+
+
+Redux is mutable but it is not good practice
+we have to make copy in redux to save actuall data
+Example :
+state = {amount:1}
+and we try to change it by this 
+state.amount = state.amount + 1
+
+above one is wrong method
+we have to change it by this way
+ return {amount: state.amount + 1}
+
+
+
+
+//How to apply middleware
+ import logger from 'redux-logger'
+
+//logger default react mein nahi dena padta node mein maang rha hai
+and then applyMiddleware(logger.default)
+
+logger show login means that previous state or value
+then new action  briefly 
+
+to stop action or to change the action in between
+logger middleware will help
+//there can be many middleware here we used for "action"
+//we can make our own middlewares
+
+
+
+
+
+
+payload can be define as
+{action.payload}
+
+
+
+
+
+//action creators used to simplify the type of action 
+//it is using normally inside function 
+function Increment(){
+    return {type: 'increment'}
+}
+
+
+
+//then we try to take data from db.json as "API"
+for that we can't get data from the api directly 
+// we have to used "redux-thunk" middleware 
+npm i redux-thunk 
+
+to handle the breakdown process of api  means 
+if we have to make "async function "
+we have to pass parameter as acess of the function 
+(dispatch,getState)  
+aur function bhi easily pass kar sakte hai 

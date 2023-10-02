@@ -11,6 +11,7 @@
 
 
 
+
 /** to increment amoumt */
 
 //Using  multi reducer type concept 
